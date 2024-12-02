@@ -1,20 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const Home = () => {
     const [tasks, setTasks] = useState([]); // Estado de las tareas
     const [inputValue, setInputValue] = useState(""); // Estado para el campo de texto
 
+    // Usamos useEffect para realizar la petición de la API al montar el componente
+    useEffect(() => {
+        fetch('https://playground.4geeks.com/todo/users/DiegoSB')
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.todos); // Muestra todas las tareas
+                setTasks(data.todos);
+            })
+            .catch(error => {
+                // Manejo de errores
+                console.error(error);
+            });
+    }, []);
+
     // Función para agregar tareas
     const addTask = (event) => {
         if (event.key === "Enter" && inputValue.trim() !== "") {
-            setTasks([...tasks, inputValue.trim()]); // Agregar nueva tarea
+            setTasks([...tasks, { label: inputValue.trim(), is_done: false }]); // Agregar nueva tarea
             setInputValue(""); // Vaciar el campo
         }
     };
 
     // Función para eliminar tareas
     const deleteTask = (index) => {
-        setTasks(tasks.filter((_, taskIndex) => taskIndex !== index));
+        setTasks(tasks.filter((_, taskIndex) => taskIndex !== index)); // Eliminar tarea por índice
     };
 
     return (
@@ -40,7 +54,7 @@ const Home = () => {
                                 key={index}
                                 className="todo-item d-flex justify-content-between align-items-center"
                             >
-                                {task}
+                                {task.label} {/* Muestra la tarea */}
                                 <span
                                     className="todo-delete"
                                     onClick={() => deleteTask(index)}
